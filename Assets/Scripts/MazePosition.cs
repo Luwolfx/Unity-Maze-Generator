@@ -19,12 +19,12 @@ public class MazePosition
 
     public void MarkAsVisited()
     {
-        cell.walls |= CellWalls.VISITED;
+        cell.walls |= CellDirections.VISITED;
     }
 
     public bool HasBeenVisited()
     {
-        return cell.walls.HasFlag(CellWalls.VISITED);
+        return cell.walls.HasFlag(CellDirections.VISITED);
     }
 
     public Vector2 ToVector2()
@@ -35,5 +35,10 @@ public class MazePosition
     public MazeCell ToCell()
     {
         return cell;
+    }
+
+    public string ToString()
+    {
+        return "(CELL_X"+x+"_Y"+y+")";
     }
 }

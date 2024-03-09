@@ -23,19 +23,19 @@ public class Maze : MonoBehaviour
     {
         if(neighbor1.x < neighbor2.x)
         {
-            neighbor2.cell.DisableWall(CellWalls.LEFT);
+            neighbor2.cell.DisableWall(CellDirections.LEFT);
         }
         else if(neighbor1.x > neighbor2.x)
         {
-            neighbor1.cell.DisableWall(CellWalls.LEFT);
+            neighbor1.cell.DisableWall(CellDirections.LEFT);
         }
         else if(neighbor1.y < neighbor2.y)
         {
-            neighbor1.cell.DisableWall(CellWalls.UP);
+            neighbor1.cell.DisableWall(CellDirections.UP);
         }
         else if(neighbor1.y > neighbor2.y)
         {
-            neighbor2.cell.DisableWall(CellWalls.UP);
+            neighbor2.cell.DisableWall(CellDirections.UP);
         }
     }
 
@@ -97,4 +97,40 @@ public class Maze : MonoBehaviour
         return GetMazePosition(position.x-1, position.y);
     }
     
+    public void DisableBorderWalls(CellDirections directions)
+    {
+        List<MazePosition> borderPositions = GetBorderPositions();
+        foreach(MazePosition mazePosition in borderPositions)
+        {
+            Debug.Log("Border maze cell: "+mazePosition.ToString());
+            if(mazePosition.x == 1 && directions.HasFlag(CellDirections.LEFT))
+            {
+                Debug.Log("Disabling UP wall from: "+mazePosition.ToString());
+                mazePosition.cell.DisableWall(CellDirections.LEFT);
+            }
+
+            if(mazePosition.x == width && directions.HasFlag(CellDirections.RIGHT))
+            {
+                Debug.Log("Disabling DOWN wall from: "+mazePosition.ToString());
+                mazePosition.cell.DisableWall(CellDirections.RIGHT);
+            }
+
+            if(mazePosition.y == 1 && directions.HasFlag(CellDirections.DOWN))
+            {
+                Debug.Log("Disabling LEFT wall from: "+mazePosition.ToString());
+                mazePosition.cell.DisableWall(CellDirections.DOWN);
+            }
+
+            if(mazePosition.y == height && directions.HasFlag(CellDirections.UP))
+            {
+                Debug.Log("Disabling RIGHT wall from: "+mazePosition.ToString());
+                mazePosition.cell.DisableWall(CellDirections.UP);
+            }
+        }
+    }
+
+    public List<MazePosition> GetBorderPositions()
+    {
+        return new List<MazePosition>(mazePositions.FindAll(x => x.x == 1 || x.x == width || x.y == 1 || x.y == height));
+    }
 }

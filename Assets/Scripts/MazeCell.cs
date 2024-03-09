@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Flags]
-public enum CellWalls{
+public enum CellDirections{
     UP = 1,
     DOWN = 2,
     LEFT = 4,
@@ -15,7 +15,7 @@ public enum CellWalls{
 public class MazeCell : MonoBehaviour
 {
     public Maze maze => GetComponentInParent<Maze>();
-    public CellWalls walls;
+    public CellDirections walls;
 
     public void Config(float size, MazePosition position)
     {
@@ -28,9 +28,12 @@ public class MazeCell : MonoBehaviour
         return maze.GetMazePosition(transform.position);
     }
 
-    public void DisableWall(CellWalls wallPos)
+    public void DisableWall(CellDirections wallPos)
     {
-        GameObject wall = transform.Find("Wall_"+wallPos.ToString()).gameObject;
-        wall.SetActive(false);
+        if(transform.Find("Wall_"+wallPos.ToString()))
+        {
+            GameObject wall = transform.Find("Wall_"+wallPos.ToString()).gameObject;
+            wall.SetActive(false);
+        }
     }
 }

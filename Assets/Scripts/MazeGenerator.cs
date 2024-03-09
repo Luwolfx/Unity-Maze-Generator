@@ -9,11 +9,11 @@ public class MazeGenerator : MonoBehaviour
     [SerializeField][Range(1, 200)] int width = 10;
     [SerializeField][Range(1, 200)] int height = 10;
     [SerializeField][Range(1, 10)] float cellSize = 2;
+    [SerializeField][Range(1, 25)] int centerCarving = 2;
     [SerializeField] bool openDeadEnds;
 
     [SerializeField] GameObject mazeCellPrefab;
     [SerializeField] GameObject wallPrefab;
-
 
     void Start() 
     {
@@ -46,7 +46,7 @@ public class MazeGenerator : MonoBehaviour
             for(int actualHeight = 1; actualHeight <= height; actualHeight++)
             {
                 MazePosition mazePosition = new MazePosition();
-                InstantiateCell(mazeCellPrefab, maze, new Vector3((startPosition.x+actualWidth)*cellSize, 0, (startPosition.y+actualHeight)*cellSize), out MazeCell mazeCell);
+                InstantiateCell(mazeCellPrefab, maze, new Vector3(((startPosition.x-width/2)+actualWidth)*cellSize, 0, ((startPosition.y-height/2)+actualHeight)*cellSize), out MazeCell mazeCell);
                 
                 mazePosition.Config(actualWidth, actualHeight, mazeCell);
                 maze.mazePositions.Add(mazePosition);
@@ -59,38 +59,41 @@ public class MazeGenerator : MonoBehaviour
     {
         foreach(MazePosition cellPosition in maze.mazePositions)
         {
+            Vector2 mazeCenter = new Vector2(maze.width/2, maze.height/2);
             MazeCell cell = cellPosition.cell;
-
-            if(cell.walls.HasFlag(CellWalls.UP))
+            if(Vector2.Distance(cellPosition.ToVector2(), mazeCenter) > centerCarving)
             {
-                Transform wallTransform = Instantiate(wallPrefab, cell.transform).transform;
-                wallTransform.name = "Wall_"+CellWalls.UP.ToString();
-                wallTransform.localPosition = new Vector3(0f, .5f, .5f);
-                wallTransform.localScale = new Vector3(1f, 1f, .05f);
-            }
+                if(cell.walls.HasFlag(CellDirections.UP))
+                {
+                    Transform wallTransform = Instantiate(wallPrefab, cell.transform).transform;
+                    wallTransform.name = "Wall_"+CellDirections.UP.ToString();
+                    wallTransform.localPosition = new Vector3(0f, .5f, .5f);
+                    wallTransform.localScale = new Vector3(1f, 1f, .05f);
+                }
 
-            if(cell.walls.HasFlag(CellWalls.LEFT))
-            {
-                Transform wallTransform = Instantiate(wallPrefab, cell.transform).transform;
-                wallTransform.name = "Wall_"+CellWalls.LEFT.ToString();
-                wallTransform.localPosition = new Vector3(-.5f, .5f, 0f);
-                wallTransform.localScale = new Vector3(.05f, 1f, 1f);
-            }
+                if(cell.walls.HasFlag(CellDirections.LEFT))
+                {
+                    Transform wallTransform = Instantiate(wallPrefab, cell.transform).transform;
+                    wallTransform.name = "Wall_"+CellDirections.LEFT.ToString();
+                    wallTransform.localPosition = new Vector3(-.5f, .5f, 0f);
+                    wallTransform.localScale = new Vector3(.05f, 1f, 1f);
+                }
 
-            if(cell.walls.HasFlag(CellWalls.RIGHT) && maze.GetPositionRightNeighbor(cellPosition) == null)
-            {
-                Transform wallTransform = Instantiate(wallPrefab, cell.transform).transform;
-                wallTransform.name = "Wall_"+CellWalls.RIGHT.ToString();
-                wallTransform.localPosition = new Vector3(.5f, .5f, 0f);
-                wallTransform.localScale = new Vector3(.05f, 1f, 1f);
-            }
+                if(cell.walls.HasFlag(CellDirections.RIGHT) && maze.GetPositionRightNeighbor(cellPosition) == null)
+                {
+                    Transform wallTransform = Instantiate(wallPrefab, cell.transform).transform;
+                    wallTransform.name = "Wall_"+CellDirections.RIGHT.ToString();
+                    wallTransform.localPosition = new Vector3(.5f, .5f, 0f);
+                    wallTransform.localScale = new Vector3(.05f, 1f, 1f);
+                }
 
-            if(cell.walls.HasFlag(CellWalls.DOWN) && maze.GetPositionDownNeighbor(cellPosition) == null)
-            {
-                Transform wallTransform = Instantiate(wallPrefab, cell.transform).transform;
-                wallTransform.name = "Wall_"+CellWalls.DOWN.ToString();
-                wallTransform.localPosition = new Vector3(0f, .5f, -.5f);
-                wallTransform.localScale = new Vector3(1f, 1f, .05f);
+                if(cell.walls.HasFlag(CellDirections.DOWN) && maze.GetPositionDownNeighbor(cellPosition) == null)
+                {
+                    Transform wallTransform = Instantiate(wallPrefab, cell.transform).transform;
+                    wallTransform.name = "Wall_"+CellDirections.DOWN.ToString();
+                    wallTransform.localPosition = new Vector3(0f, .5f, -.5f);
+                    wallTransform.localScale = new Vector3(1f, 1f, .05f);
+                }
             }
         }
     }

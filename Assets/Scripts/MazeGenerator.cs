@@ -9,6 +9,7 @@ public class MazeGenerator : MonoBehaviour
     [SerializeField][Range(1, 200)] int width = 10;
     [SerializeField][Range(1, 200)] int height = 10;
     [SerializeField][Range(1, 10)] float cellSize = 2;
+    [SerializeField] bool openDeadEnds;
 
     [SerializeField] GameObject mazeCellPrefab;
     [SerializeField] GameObject wallPrefab;
@@ -98,12 +99,14 @@ public class MazeGenerator : MonoBehaviour
     {
         bool deadEnd = false;
         List<MazePosition> path = new List<MazePosition>();
+        bool deadEndOpened = false;
 
         maze.mazePositions[0].MarkAsVisited();
         path.Add(maze.mazePositions[0]);
 
         while(!deadEnd)
         {
+
             List<MazePosition> pathPossibilities = maze.GetUnvisitedNeighbors(path[path.Count-1]);
 
             if(pathPossibilities.Count > 0)
@@ -113,6 +116,23 @@ public class MazeGenerator : MonoBehaviour
                 maze.DisableNeighborsWall(path[path.Count-1], pathPossibilities[randomPos]);
                 pathPossibilities[randomPos].MarkAsVisited();
                 path.Add(pathPossibilities[randomPos]);
+                deadEndOpened = false;
+            }
+            else if(openDeadEnds && !deadEndOpened)
+            {
+                pathPossibilities = maze.GetNeighbors(path[path.Count-1]);
+                if(pathPossibilities.Contains(path[path.Count-2]))
+                    pathPossibilities.Remove(path[path.Count-2]);
+                deadEndOpened = true;
+
+                if(pathPossibilities.Count > 0)
+                {
+                    int randomPos = Random.Range(0, pathPossibilities.Count);
+
+                    maze.DisableNeighborsWall(path[path.Count-1], pathPossibilities[randomPos]);
+                    pathPossibilities[randomPos].MarkAsVisited();
+                    path.Add(pathPossibilities[randomPos]);
+                }
             }
             else if(path.Count > 0)
             {

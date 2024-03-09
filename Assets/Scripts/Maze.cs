@@ -58,6 +58,25 @@ public class Maze : MonoBehaviour
         return result;
     }
 
+    public List<MazePosition> GetNeighbors(MazePosition position)
+    {
+        List<MazePosition> result = new List<MazePosition>();
+        
+        MazePosition upNeighbor = GetPositionUpNeighbor(position);
+        if(upNeighbor != null) result.Add(upNeighbor);
+
+        MazePosition downNeighbor = GetPositionDownNeighbor(position);
+        if(downNeighbor != null) result.Add(downNeighbor);
+
+        MazePosition leftNeighbor = GetPositionLeftNeighbor(position);
+        if(leftNeighbor != null) result.Add(leftNeighbor);
+
+        MazePosition rightNeighbor = GetPositionRightNeighbor(position);
+        if(rightNeighbor != null) result.Add(rightNeighbor);
+
+        return result;
+    }
+
     public MazePosition GetPositionUpNeighbor(MazePosition position)
     {
         return GetMazePosition(position.x, position.y+1);

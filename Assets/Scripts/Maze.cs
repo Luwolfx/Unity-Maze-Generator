@@ -1,13 +1,37 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [System.Serializable]
 public class Maze : MonoBehaviour
 {
-    public int width;
-    public int height;
-    public float cellSize;
+    [Header("Maze Settings")]
+    [SerializeField] Vector2 position;
+    [SerializeField] int width;
+    [SerializeField] int height;
+    [SerializeField] float cellSize;
+    [SerializeField] GameObject mazeCellPrefab;
+    [SerializeField] GameObject wallPrefab;
+
+    [Header("Maze Info")]
     public List<MazePosition> mazePositions;
+
+    public void Config(Vector2 position, int width, int height, float cellSize, GameObject mazeCellPrefab, GameObject wallPrefab)
+    {
+        this.position = position;
+        this.width = width;
+        this.height = height;
+        this.cellSize = cellSize;
+        this.mazeCellPrefab = mazeCellPrefab;
+        this.wallPrefab = wallPrefab;
+    }
+
+    public Vector2 GetPosition() => position;
+    public int GetWidth() => width;
+    public int GetHeight() => height;
+    public float GetCellSize() => cellSize;
+    public GameObject GetCellPrefab() => mazeCellPrefab;
+    public GameObject GetCellWallPrefab() => wallPrefab;
 
     public MazePosition GetMazePosition(int width, int height)
     {

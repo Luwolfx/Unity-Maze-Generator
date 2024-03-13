@@ -446,13 +446,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   openDeadEnds: 1
-  mazeCellPrefab: {fileID: 627345347603060034, guid: e612916b7aec5b94fb5461902995120f, type: 3}
-  wallPrefab: {fileID: 125935640389429121, guid: ddda9dec0a54d97449034750ac939023, type: 3}
   startPosition: {x: 0, y: 0}
-  width: 10
-  height: 10
-  cellSize: 3
-  centerCarving: 1
+  testWidth: 10
+  testHeight: 10
+  testCellSize: 3
+  testCenterCarving: 2
+  testMazeCellPrefab: {fileID: 627345347603060034, guid: e612916b7aec5b94fb5461902995120f, type: 3}
+  testMazeCellWallPrefab: {fileID: 125935640389429121, guid: ddda9dec0a54d97449034750ac939023, type: 3}
 --- !u!4 &992911078
 Transform:
   m_ObjectHideFlags: 0

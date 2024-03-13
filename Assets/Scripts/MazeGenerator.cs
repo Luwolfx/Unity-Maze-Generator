@@ -5,26 +5,28 @@ using UnityEngine;
 public class MazeGenerator : MonoBehaviour
 {
     [Header("Maze Config")]
+    [SerializeField] bool openDeadEnds;
+    [SerializeField] GameObject mazeCellPrefab;
+    [SerializeField] GameObject wallPrefab;
+
+    [Header("Test Configs")]
     [SerializeField] Vector2 startPosition;
     [SerializeField][Range(1, 200)] int width = 10;
     [SerializeField][Range(1, 200)] int height = 10;
     [SerializeField][Range(1, 10)] float cellSize = 2;
     [SerializeField][Range(1, 25)] int centerCarving = 2;
-    [SerializeField] bool openDeadEnds;
 
-    [SerializeField] GameObject mazeCellPrefab;
-    [SerializeField] GameObject wallPrefab;
-
-    void Start() 
+    [ContextMenu("CreateMazeWithTestConfig")]
+    void CreateMazeWithTestConfig()
     {
-        CreateMaze(width, height, cellSize);
+        CreateMaze(startPosition, width, height, cellSize, centerCarving);
     }
 
-    public void CreateMaze(int width, int height, float cellSize)
+    public void CreateMaze(Vector2 spawnPos, int width, int height, float cellSize, int centerCarveSpace)
     {
         GenerateMaze( out Maze maze );
-        GenerateMazeGrid(maze, width, height, cellSize);
-        GenerateWalls(maze);
+        GenerateMazeGrid(spawnPos, maze, width, height, cellSize);
+        GenerateWalls(maze, centerCarveSpace);
         GeneratePath(maze);
     }
 
@@ -32,10 +34,11 @@ public class MazeGenerator : MonoBehaviour
     {
         GameObject mazeObject = new GameObject();
         mazeObject.name = "Maze";
+        mazeObject.transform.parent = gameObject.transform;
         maze = mazeObject.AddComponent<Maze>();
     }
 
-    void GenerateMazeGrid(Maze maze, int width, int height, float cellSize)
+    void GenerateMazeGrid(Vector2 spawnPos, Maze maze, int width, int height, float cellSize)
     {
         maze.width = width;
         maze.height = height;
@@ -46,7 +49,7 @@ public class MazeGenerator : MonoBehaviour
             for(int actualHeight = 1; actualHeight <= height; actualHeight++)
             {
                 MazePosition mazePosition = new MazePosition();
-                InstantiateCell(mazeCellPrefab, maze, new Vector3(((startPosition.x-width/2)+actualWidth)*cellSize, 0, ((startPosition.y-height/2)+actualHeight)*cellSize), out MazeCell mazeCell);
+                InstantiateCell(mazeCellPrefab, maze, new Vector3(((spawnPos.x-width/2)+actualWidth)*cellSize, 0, ((spawnPos.y-height/2)+actualHeight)*cellSize), out MazeCell mazeCell);
                 
                 mazePosition.Config(actualWidth, actualHeight, mazeCell);
                 maze.mazePositions.Add(mazePosition);
@@ -55,13 +58,13 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
-    void GenerateWalls(Maze maze)
+    void GenerateWalls(Maze maze, int centerCarveSpace)
     {
         foreach(MazePosition cellPosition in maze.mazePositions)
         {
             Vector2 mazeCenter = new Vector2(maze.width/2, maze.height/2);
             MazeCell cell = cellPosition.cell;
-            if(Vector2.Distance(cellPosition.ToVector2(), mazeCenter) > centerCarving)
+            if(Vector2.Distance(cellPosition.ToVector2(), mazeCenter) > centerCarveSpace)
             {
                 if(cell.walls.HasFlag(CellDirections.UP))
                 {

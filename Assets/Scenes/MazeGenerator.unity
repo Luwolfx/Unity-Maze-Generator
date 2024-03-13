@@ -445,17 +445,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46668d98167535b47927bdad90d6f6d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPosition: {x: 0, y: 0}
-  width: 21
-  height: 21
-  cellSize: 5
-  centerCarving: 1
   openDeadEnds: 1
   mazeCellPrefab: {fileID: 627345347603060034, guid: e612916b7aec5b94fb5461902995120f, type: 3}
   wallPrefab: {fileID: 125935640389429121, guid: ddda9dec0a54d97449034750ac939023, type: 3}
-  mazeToDisableBorder: {fileID: 0}
-  toDisableBorder: 0
-  disableBorder: 0
+  startPosition: {x: 0, y: 0}
+  width: 10
+  height: 10
+  cellSize: 3
+  centerCarving: 1
 --- !u!4 &992911078
 Transform:
   m_ObjectHideFlags: 0
@@ -482,7 +479,7 @@ GameObject:
   - component: {fileID: 1550610547}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -11,22 +11,23 @@ public class MazeGenerator : MonoBehaviour
     [SerializeField] Vector2 startPosition;
     [SerializeField][Range(1, 200)] int testWidth = 10;
     [SerializeField][Range(1, 200)] int testHeight = 10;
-    [SerializeField][Range(1, 10)] float testCellSize = 2;
+    [SerializeField][Range(1, 10)] float testCellSize = 2f;
     [SerializeField][Range(0, 10)] int testCenterCarving = 2;
+    [SerializeField][Range(.001f, .5f)] float testWallThickness = .05f;
     [SerializeField] GameObject testMazeCellPrefab;
     [SerializeField] GameObject testMazeCellWallPrefab;
 
     [ContextMenu("CreateMazeWithTestConfig")]
     void CreateMazeWithTestConfig()
     {
-        CreateMaze(startPosition, testWidth, testHeight, testCellSize, testCenterCarving, testMazeCellPrefab, testMazeCellWallPrefab);
+        CreateMaze(startPosition, testWidth, testHeight, testCellSize, testCenterCarving, testWallThickness, testMazeCellPrefab, testMazeCellWallPrefab);
     }
 
-    public void CreateMaze(Vector2 spawnPos, int width, int height, float cellSize, int centerCarveSpace, GameObject cellPrefab, GameObject wallPrefab)
+    public void CreateMaze(Vector2 spawnPos, int width, int height, float cellSize, int centerCarveSpace, float wallThickness, GameObject cellPrefab, GameObject wallPrefab)
     {
         GenerateMaze( out Maze maze, spawnPos, width, height, cellSize, cellPrefab, wallPrefab );
         GenerateMazeGrid(maze);
-        GenerateWalls(maze, centerCarveSpace);
+        GenerateWalls(maze, centerCarveSpace, wallThickness);
         GeneratePath(maze);
     }
 
@@ -57,20 +58,20 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
-    void GenerateWalls(Maze maze, int centerCarveSpace)
+    void GenerateWalls(Maze maze, int centerCarveSpace, float wallThickness)
     {
         foreach(MazePosition cellPosition in maze.mazePositions)
         {
             Vector2 mazeCenter = new Vector2(maze.GetWidth()/2, maze.GetHeight()/2);
             MazeCell cell = cellPosition.cell;
-            if(Vector2.Distance(cellPosition.ToVector2(), mazeCenter) > centerCarveSpace)
+            if(Vector2.Distance(cellPosition.ToVector2(), mazeCenter) > centerCarveSpace || maze.IsBorderCell(cell))
             {
                 if(cell.walls.HasFlag(CellDirections.UP))
                 {
                     Transform wallTransform = Instantiate(maze.GetCellWallPrefab(), cell.transform).transform;
                     wallTransform.name = "Wall_"+CellDirections.UP.ToString();
                     wallTransform.localPosition = new Vector3(0f, .5f, .5f);
-                    wallTransform.localScale = new Vector3(1f, 1f, .05f);
+                    wallTransform.localScale = new Vector3(1f, 1f, wallThickness);
                 }
 
                 if(cell.walls.HasFlag(CellDirections.LEFT))
@@ -78,7 +79,7 @@ public class MazeGenerator : MonoBehaviour
                     Transform wallTransform = Instantiate(maze.GetCellWallPrefab(), cell.transform).transform;
                     wallTransform.name = "Wall_"+CellDirections.LEFT.ToString();
                     wallTransform.localPosition = new Vector3(-.5f, .5f, 0f);
-                    wallTransform.localScale = new Vector3(.05f, 1f, 1f);
+                    wallTransform.localScale = new Vector3(wallThickness, 1f, 1f);
                 }
 
                 if(cell.walls.HasFlag(CellDirections.RIGHT) && maze.GetPositionRightNeighbor(cellPosition) == null)
@@ -86,7 +87,7 @@ public class MazeGenerator : MonoBehaviour
                     Transform wallTransform = Instantiate(maze.GetCellWallPrefab(), cell.transform).transform;
                     wallTransform.name = "Wall_"+CellDirections.RIGHT.ToString();
                     wallTransform.localPosition = new Vector3(.5f, .5f, 0f);
-                    wallTransform.localScale = new Vector3(.05f, 1f, 1f);
+                    wallTransform.localScale = new Vector3(wallThickness, 1f, 1f);
                 }
 
                 if(cell.walls.HasFlag(CellDirections.DOWN) && maze.GetPositionDownNeighbor(cellPosition) == null)
@@ -94,7 +95,7 @@ public class MazeGenerator : MonoBehaviour
                     Transform wallTransform = Instantiate(maze.GetCellWallPrefab(), cell.transform).transform;
                     wallTransform.name = "Wall_"+CellDirections.DOWN.ToString();
                     wallTransform.localPosition = new Vector3(0f, .5f, -.5f);
-                    wallTransform.localScale = new Vector3(1f, 1f, .05f);
+                    wallTransform.localScale = new Vector3(1f, 1f, wallThickness);
                 }
             }
         }

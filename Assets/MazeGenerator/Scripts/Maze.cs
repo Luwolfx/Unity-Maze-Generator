@@ -157,4 +157,56 @@ public class Maze : MonoBehaviour
     {
         return new List<MazePosition>(mazePositions.FindAll(x => x.x == 1 || x.x == width || x.y == 1 || x.y == height));
     }
+
+    public bool IsBorderWall(MazePosition cellPosition, CellDirections wallDirection)
+    {
+        switch(wallDirection)
+        {
+            case CellDirections.UP:
+
+                if(GetPositionUpNeighbor(cellPosition) == null)
+                {
+                    return true;
+                }
+                else
+                    return false;
+
+            case CellDirections.DOWN:
+
+                if(GetPositionDownNeighbor(cellPosition) == null)
+                    return true;
+                else
+                    return false;
+
+            case CellDirections.LEFT:
+
+                if(GetPositionLeftNeighbor(cellPosition) == null)
+                    return true;
+                else
+                    return false;
+
+            case CellDirections.RIGHT:
+
+                if(GetPositionRightNeighbor(cellPosition) == null)
+                    return true;
+                else
+                    return false;
+            
+            default: return false;
+        }
+    }
+
+    public bool IsBorderCell(MazeCell cell)
+    {
+        if(GetPositionUpNeighbor(cell.GetMazePosition()) == null)
+            return true;
+        else if(GetPositionDownNeighbor(cell.GetMazePosition()) == null)
+            return true;
+        else if(GetPositionLeftNeighbor(cell.GetMazePosition()) == null)
+            return true;
+        else if(GetPositionRightNeighbor(cell.GetMazePosition()) == null)
+            return true;
+        
+        return false;
+    }
 }

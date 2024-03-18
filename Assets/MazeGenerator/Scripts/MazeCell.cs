@@ -39,7 +39,7 @@ public class MazeCell : MonoBehaviour
 
     public MazePosition GetMazePosition()
     {
-        return maze.GetMazePosition(transform.position);
+        return maze.GetMazeCellPosition(transform.position);
     }
 
     public void DisableWall(CellDirections wallPos)
@@ -48,6 +48,19 @@ public class MazeCell : MonoBehaviour
         {
             GameObject wall = transform.Find("Wall_"+wallPos.ToString()).gameObject;
             wall.SetActive(false);
+        }
+    }
+
+    public void EnableWall(CellDirections wallPos)
+    {
+        if(transform.Find("Wall_"+wallPos.ToString()))
+        {
+            GameObject wall = transform.Find("Wall_"+wallPos.ToString()).gameObject;
+            wall.SetActive(true);
+        }
+        else
+        {
+            //TODO: GENERATE WALL
         }
     }
 }

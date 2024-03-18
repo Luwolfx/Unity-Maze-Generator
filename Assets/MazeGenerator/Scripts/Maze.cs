@@ -29,6 +29,8 @@ public class Maze : MonoBehaviour
     [Header("Maze Info")]
     public List<MazePosition> mazePositions;
 
+#region MAZE_INFO
+
     public void Config(Vector2 position, int width, int height, float cellSize, GameObject mazeCellPrefab, GameObject wallPrefab)
     {
         this.position = position;
@@ -46,12 +48,16 @@ public class Maze : MonoBehaviour
     public GameObject GetCellPrefab() => mazeCellPrefab;
     public GameObject GetCellWallPrefab() => wallPrefab;
 
-    public MazePosition GetMazePosition(int width, int height)
+#endregion
+
+#region CELL_INFO
+
+    public MazePosition GetMazeCellPosition(int width, int height)
     {
         return mazePositions.Find(x => x.x == width && x.y == height);
     }
 
-    public MazePosition GetMazePosition(Vector3 position)
+    public MazePosition GetMazeCellPosition(Vector3 position)
     {
         return mazePositions.Find(x => x.cell.transform.position == position);
     }
@@ -80,89 +86,143 @@ public class Maze : MonoBehaviour
     {
         List<MazePosition> result = new List<MazePosition>();
         
-        MazePosition upNeighbor = GetPositionUpNeighbor(position);
+        MazePosition upNeighbor = GetCellPositionUpNeighbor(position);
         if(upNeighbor != null && !upNeighbor.HasBeenVisited()) result.Add(upNeighbor);
 
-        MazePosition downNeighbor = GetPositionDownNeighbor(position);
+        MazePosition downNeighbor = GetCellPositionDownNeighbor(position);
         if(downNeighbor != null && !downNeighbor.HasBeenVisited()) result.Add(downNeighbor);
 
-        MazePosition leftNeighbor = GetPositionLeftNeighbor(position);
+        MazePosition leftNeighbor = GetCellPositionLeftNeighbor(position);
         if(leftNeighbor != null && !leftNeighbor.HasBeenVisited()) result.Add(leftNeighbor);
 
-        MazePosition rightNeighbor = GetPositionRightNeighbor(position);
+        MazePosition rightNeighbor = GetCellPositionRightNeighbor(position);
         if(rightNeighbor != null && !rightNeighbor.HasBeenVisited()) result.Add(rightNeighbor);
 
         return result;
     }
 
-    public List<MazePosition> GetNeighbors(MazePosition position)
+    public List<MazePosition> GetCellNeighbors(MazePosition position)
     {
         List<MazePosition> result = new List<MazePosition>();
         
-        MazePosition upNeighbor = GetPositionUpNeighbor(position);
+        MazePosition upNeighbor = GetCellPositionUpNeighbor(position);
         if(upNeighbor != null) result.Add(upNeighbor);
 
-        MazePosition downNeighbor = GetPositionDownNeighbor(position);
+        MazePosition downNeighbor = GetCellPositionDownNeighbor(position);
         if(downNeighbor != null) result.Add(downNeighbor);
 
-        MazePosition leftNeighbor = GetPositionLeftNeighbor(position);
+        MazePosition leftNeighbor = GetCellPositionLeftNeighbor(position);
         if(leftNeighbor != null) result.Add(leftNeighbor);
 
-        MazePosition rightNeighbor = GetPositionRightNeighbor(position);
+        MazePosition rightNeighbor = GetCellPositionRightNeighbor(position);
         if(rightNeighbor != null) result.Add(rightNeighbor);
 
         return result;
     }
 
-    public MazePosition GetPositionUpNeighbor(MazePosition position)
+    public MazePosition GetCellPositionUpNeighbor(MazePosition position)
     {
-        return GetMazePosition(position.x, position.y+1);
+        return GetMazeCellPosition(position.x, position.y+1);
     }
 
-    public MazePosition GetPositionDownNeighbor(MazePosition position)
+    public MazePosition GetCellPositionDownNeighbor(MazePosition position)
     {
-        return GetMazePosition(position.x, position.y-1);
+        return GetMazeCellPosition(position.x, position.y-1);
     }
 
-    public MazePosition GetPositionRightNeighbor(MazePosition position)
+    public MazePosition GetCellPositionRightNeighbor(MazePosition position)
     {
-        return GetMazePosition(position.x+1, position.y);
+        return GetMazeCellPosition(position.x+1, position.y);
     }
 
-    public MazePosition GetPositionLeftNeighbor(MazePosition position)
+    public MazePosition GetCellPositionLeftNeighbor(MazePosition position)
     {
-        return GetMazePosition(position.x-1, position.y);
+        return GetMazeCellPosition(position.x-1, position.y);
     }
-    
+
+    public bool IsBorderCell(MazeCell cell)
+    {
+        if(GetCellPositionUpNeighbor(cell.GetMazePosition()) == null)
+            return true;
+        else if(GetCellPositionDownNeighbor(cell.GetMazePosition()) == null)
+            return true;
+        else if(GetCellPositionLeftNeighbor(cell.GetMazePosition()) == null)
+            return true;
+        else if(GetCellPositionRightNeighbor(cell.GetMazePosition()) == null)
+            return true;
+        
+        return false;
+    }
+
+#endregion    
+
+    [ContextMenu("DisableUpBorderWalls")]
+    public void DisableUpBorderWalls()
+    {
+        DisableBorderWalls(CellDirections.UP);
+    }
+
+    [ContextMenu("DisableDownBorderWalls")]
+    public void DisableDownBorderWalls()
+    {
+        DisableBorderWalls(CellDirections.DOWN);
+    }
+
+    [ContextMenu("DisableLeftBorderWalls")]
+    public void DisableLeftBorderWalls()
+    {
+        DisableBorderWalls(CellDirections.LEFT);
+    }
+
+    [ContextMenu("DisableRightBorderWalls")]
+    public void DisableRightBorderWalls()
+    {
+        DisableBorderWalls(CellDirections.RIGHT);
+    }
+
     public void DisableBorderWalls(CellDirections directions)
     {
         List<MazePosition> borderPositions = GetBorderPositions();
         foreach(MazePosition mazePosition in borderPositions)
         {
-            Debug.Log("Border maze cell: "+mazePosition.ToString());
             if(mazePosition.x == 1 && directions.HasFlag(CellDirections.LEFT))
             {
-                Debug.Log("Disabling UP wall from: "+mazePosition.ToString());
                 mazePosition.cell.DisableWall(CellDirections.LEFT);
             }
 
             if(mazePosition.x == width && directions.HasFlag(CellDirections.RIGHT))
             {
-                Debug.Log("Disabling DOWN wall from: "+mazePosition.ToString());
                 mazePosition.cell.DisableWall(CellDirections.RIGHT);
             }
 
             if(mazePosition.y == 1 && directions.HasFlag(CellDirections.DOWN))
             {
-                Debug.Log("Disabling LEFT wall from: "+mazePosition.ToString());
                 mazePosition.cell.DisableWall(CellDirections.DOWN);
             }
 
             if(mazePosition.y == height && directions.HasFlag(CellDirections.UP))
             {
-                Debug.Log("Disabling RIGHT wall from: "+mazePosition.ToString());
                 mazePosition.cell.DisableWall(CellDirections.UP);
             }
+        }
+    }
+
+    public void EnableBorderWalls(CellDirections directions)
+    {
+        List<MazePosition> borderPositions = GetBorderPositions();
+        foreach(MazePosition mazePosition in borderPositions)
+        {
+            if(mazePosition.x == 1 && directions.HasFlag(CellDirections.LEFT))
+                mazePosition.cell.EnableWall(CellDirections.LEFT);
+
+            if(mazePosition.x == width && directions.HasFlag(CellDirections.RIGHT))
+                mazePosition.cell.EnableWall(CellDirections.RIGHT);
+
+            if(mazePosition.y == 1 && directions.HasFlag(CellDirections.DOWN))
+                mazePosition.cell.EnableWall(CellDirections.DOWN);
+
+            if(mazePosition.y == height && directions.HasFlag(CellDirections.UP))
+                mazePosition.cell.EnableWall(CellDirections.UP);
         }
     }
 
@@ -177,7 +237,7 @@ public class Maze : MonoBehaviour
         {
             case CellDirections.UP:
 
-                if(GetPositionUpNeighbor(cellPosition) == null)
+                if(GetCellPositionUpNeighbor(cellPosition) == null)
                 {
                     return true;
                 }
@@ -186,21 +246,21 @@ public class Maze : MonoBehaviour
 
             case CellDirections.DOWN:
 
-                if(GetPositionDownNeighbor(cellPosition) == null)
+                if(GetCellPositionDownNeighbor(cellPosition) == null)
                     return true;
                 else
                     return false;
 
             case CellDirections.LEFT:
 
-                if(GetPositionLeftNeighbor(cellPosition) == null)
+                if(GetCellPositionLeftNeighbor(cellPosition) == null)
                     return true;
                 else
                     return false;
 
             case CellDirections.RIGHT:
 
-                if(GetPositionRightNeighbor(cellPosition) == null)
+                if(GetCellPositionRightNeighbor(cellPosition) == null)
                     return true;
                 else
                     return false;
@@ -209,17 +269,8 @@ public class Maze : MonoBehaviour
         }
     }
 
-    public bool IsBorderCell(MazeCell cell)
+    public string ToString()
     {
-        if(GetPositionUpNeighbor(cell.GetMazePosition()) == null)
-            return true;
-        else if(GetPositionDownNeighbor(cell.GetMazePosition()) == null)
-            return true;
-        else if(GetPositionLeftNeighbor(cell.GetMazePosition()) == null)
-            return true;
-        else if(GetPositionRightNeighbor(cell.GetMazePosition()) == null)
-            return true;
-        
-        return false;
+        return $"MazeBlock: ({gameObject.name}, position:{position.x},{position.y}, width:{width}, height:{height}, cellsize:{cellSize}, mazeCells:{mazePositions.Count})";
     }
 }

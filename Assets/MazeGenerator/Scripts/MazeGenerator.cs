@@ -37,18 +37,20 @@ public class MazeGenerator : MonoBehaviour
         CreateMaze(startPosition, testWidth, testHeight, testCellSize, testCenterCarving, testWallThickness, testMazeCellPrefab, testMazeCellWallPrefab);
     }
 
-    public void CreateMaze(Vector2 spawnPos, int width, int height, float cellSize, int centerCarveSpace, float wallThickness, GameObject cellPrefab, GameObject wallPrefab)
+    public Maze CreateMaze(Vector2 spawnPos, int width, int height, float cellSize, int centerCarveSpace, float wallThickness, GameObject cellPrefab, GameObject wallPrefab)
     {
         GenerateMaze( out Maze maze, spawnPos, width, height, cellSize, cellPrefab, wallPrefab );
         GenerateMazeGrid(maze);
         GenerateWalls(maze, centerCarveSpace, wallThickness);
         GeneratePath(maze);
+
+        return maze;
     }
 
     void GenerateMaze(out Maze maze, Vector2 position, int width, int height, float cellSize, GameObject cellPrefab, GameObject wallPrefab)
     {
         GameObject mazeObject = new GameObject();
-        mazeObject.name = "MazeBlock";
+        mazeObject.name = $"MazeBlock({position.x},{position.y})";
         mazeObject.transform.position = new Vector3(position.x*cellSize, 0, position.y*cellSize);
         mazeObject.transform.parent = gameObject.transform;
         maze = mazeObject.AddComponent<Maze>();
@@ -96,7 +98,7 @@ public class MazeGenerator : MonoBehaviour
                     wallTransform.localScale = new Vector3(wallThickness, 1f, 1f);
                 }
 
-                if(cell.walls.HasFlag(CellDirections.RIGHT) && maze.GetPositionRightNeighbor(cellPosition) == null)
+                if(cell.walls.HasFlag(CellDirections.RIGHT) && maze.GetCellPositionRightNeighbor(cellPosition) == null)
                 {
                     Transform wallTransform = Instantiate(maze.GetCellWallPrefab(), cell.transform).transform;
                     wallTransform.name = "Wall_"+CellDirections.RIGHT.ToString();
@@ -104,7 +106,7 @@ public class MazeGenerator : MonoBehaviour
                     wallTransform.localScale = new Vector3(wallThickness, 1f, 1f);
                 }
 
-                if(cell.walls.HasFlag(CellDirections.DOWN) && maze.GetPositionDownNeighbor(cellPosition) == null)
+                if(cell.walls.HasFlag(CellDirections.DOWN) && maze.GetCellPositionDownNeighbor(cellPosition) == null)
                 {
                     Transform wallTransform = Instantiate(maze.GetCellWallPrefab(), cell.transform).transform;
                     wallTransform.name = "Wall_"+CellDirections.DOWN.ToString();
@@ -140,7 +142,7 @@ public class MazeGenerator : MonoBehaviour
             }
             else if(openDeadEnds && !deadEndOpened)
             {
-                pathPossibilities = maze.GetNeighbors(path[path.Count-1]);
+                pathPossibilities = maze.GetCellNeighbors(path[path.Count-1]);
                 if(pathPossibilities.Contains(path[path.Count-2]))
                     pathPossibilities.Remove(path[path.Count-2]);
                 deadEndOpened = true;
@@ -174,4 +176,37 @@ public class MazeGenerator : MonoBehaviour
         returnCell = instantiatedCell.GetComponent<MazeCell>();
     }
 
+    public Maze GetMazeBlockAtPosition(Vector3 targetPos)
+    {
+        Maze nearestMaze = null;
+        float nearestDistance = 9999;
+
+        foreach(Transform mazeBlockTransform in transform)
+        {
+            Maze mazeBlock = mazeBlockTransform.GetComponent<Maze>();
+            if(Vector3.Distance(targetPos, mazeBlock.transform.position) < nearestDistance)
+            {
+                nearestMaze = mazeBlock;
+                nearestDistance = Vector3.Distance(targetPos, mazeBlock.transform.position);
+            }
+        }
+        
+        return nearestMaze;
+    }
+
+    public Maze GetMazeBlockAtPosition(Vector2 targetPos)
+    {
+        return GetMazeBlocks().Find(x => x.GetPosition() == targetPos);
+    }
+
+    public List<Maze> GetMazeBlocks()
+    {
+        List<Maze> MazeBlocks = new List<Maze>();
+        foreach(Transform mazeBlockTransform in transform)
+        {
+            MazeBlocks.Add(mazeBlockTransform.GetComponent<Maze>());
+            
+        }
+        return MazeBlocks;
+    }
 }

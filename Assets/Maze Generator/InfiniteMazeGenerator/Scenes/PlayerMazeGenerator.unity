@@ -818,6 +818,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 2061930140}
   mazeGen: {fileID: 992911077}
+  playerMazeBlock: {fileID: 0}
+  lastSpawnPos: {x: 0, y: 0}
   startPosition: {x: 0, y: 0}
   mazeWidth: 10
   mazeHeight: 10
@@ -826,7 +828,6 @@ MonoBehaviour:
   mazeWallThickness: 0.05
   mazeMazeCellPrefab: {fileID: 627345347603060034, guid: e612916b7aec5b94fb5461902995120f, type: 3}
   mazeMazeCellWallPrefab: {fileID: 125935640389429121, guid: ddda9dec0a54d97449034750ac939023, type: 3}
-  testGetMazeBlockPosition: {fileID: 2061930140}
 --- !u!4 &1688264140
 Transform:
   m_ObjectHideFlags: 0
@@ -857,7 +858,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1771551062
 Transform:
   m_ObjectHideFlags: 0
